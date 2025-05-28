@@ -1,0 +1,80 @@
+# Okta Workflows – Automation Logic
+
+This folder contains exported `.flow` files used to automate Okta provisioning, deprovisioning, and integration with external tools like Freshdesk, Jira, Slack, and Datadog.
+
+Each `.flow` file can be imported directly into [workflows.okta.com](https://workflows.okta.com) for review or reuse.
+
+---
+
+## 📦 Included Workflows
+
+### 🟦 BambooHR User Terminated
+
+- Trigger: BambooHR API Webhook
+- Logic:
+  - Checks if `employee_status = terminated`
+  - Gets user email from Okta
+  - Removes user from all Okta groups
+  - Suspends and deactivates the user in Okta
+  - Notifies the IT team via Slack
+  - Logs all actions to Datadog
+
+---
+
+### 🟧 Jira API Hook
+
+- Trigger: Jira ticket event (created, updated, moved)
+- Logic:
+  - Gets user name + email from ticket
+  - Chooses PUT, POST, or DELETE method based on ticket type
+  - Notifies IT via Slack
+  - Notifies requestor
+  - Logs activity in Datadog
+  - Closes the ticket in Jira
+
+---
+
+### 🟥 Freshdesk Delete
+
+- Trigger: Okta user deactivation
+- Logic:
+  - Gets Freshdesk user ID from email
+  - Calls DELETE `/users/{id}` in Freshdesk
+  - Sends status update to Slack
+  - Logs result to Datadog
+
+---
+
+### 🟨 Freshdesk Update PUT
+
+- Trigger: Okta user updated (specific fields)
+- Logic:
+  - Gets Freshdesk user ID
+  - Calls PUT `/users/{id}` with updated fields
+  - Notifies team via Slack
+  - Logs to Datadog
+
+---
+
+### 🟩 Freshdesk Create POST
+
+- Trigger: Okta user created
+- Logic:
+  - Gets user email and fields from Okta
+  - Calls POST `/users` to create in Freshdesk
+  - Notifies team via Slack
+  - Logs result to Datadog
+
+---
+
+## 🧪 Optional (Future) Flow: Central Error Logger
+
+- Triggered on API failure (POST, GET, PUT, DELETE)
+- Captures:
+  - Ticket ID
+  - Timestamp
+  - Email
+  - Execution ID
+  - Error status
+- Logs everything to Datadog
+- Enables centralized flow failure monitoring
